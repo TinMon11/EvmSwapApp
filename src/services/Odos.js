@@ -1,10 +1,22 @@
 import axios from "axios";
-import { ethers } from "ethers";
 
 const ODOS_BASE_URL = "https://api.odos.xyz/";
+
+const COVALENT_NATIVE_TOKEN_ADDRESSES = [
+  "0x0000000000000000000000000000000000001010",
+  "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+];
+
+const axiosInstance = axios.create({
+  baseURL: ODOS_BASE_URL,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
 export const getOdosSupportedTokens = async (chainId) => {
   try {
-    const res = await axios.get(`${ODOS_BASE_URL}info/tokens/${chainId}`);
+    const res = await axiosInstance.get(`info/tokens/${chainId}`);
     const tokensList = res.data.tokenMap;
     return tokensList;
   } catch (error) {
@@ -14,9 +26,10 @@ export const getOdosSupportedTokens = async (chainId) => {
 
 export const getTokenPriceFromOdos = async (chainId, tokenAddress) => {
   try {
-    const res = await axios.get(
-      `${ODOS_BASE_URL}pricing/token/${chainId}/${tokenAddress}`
+    const res = await axiosInstance.get(
+      `pricing/token/${chainId}/${tokenAddress}`
     );
+
     return Number(res.data.price);
   } catch (error) {
     throw new Error(`Error fetching token price for ${tokenAddress}: ${error}`);
@@ -30,21 +43,10 @@ export const getOdosQuote = async (
   amountIn,
   userAddress
 ) => {
-  console.log(
-    "GETTING ODOS QUOTE",
-    inputTokenAddress,
-    outputTokenAddress,
-    amountIn
-  );
-  if (
-    // Covalent may have this address for native tokens on some chains
-    inputTokenAddress === "0x0000000000000000000000000000000000001010" ||
-    inputTokenAddress === "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
-  ) {
-    inputTokenAddress = "0x0000000000000000000000000000000000000000";
-  }
   amountIn = Math.floor(amountIn);
-  console.log("AMOUNT IN EN ODOS", amountIn);
+
+  inputTokenAddress = normalizeAddress(inputTokenAddress);
+
   let swapData = JSON.stringify({
     chainId: chainId,
     inputTokens: [
@@ -67,19 +69,9 @@ export const getOdosQuote = async (
     pathViz: false,
     disableRFQs: true,
   });
-  console.log("swapData", swapData);
-  try {
-    const response = await axios.post(
-      `${ODOS_BASE_URL}sor/quote/v2`,
-      swapData,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-      }
-    );
 
+  try {
+    const response = await axiosInstance.post(`sor/quote/v2`, swapData);
     const assembledTransaction = await odosAssembleTransaction(
       userAddress,
       response.data.pathId
@@ -99,14 +91,15 @@ export const odosAssembleTransaction = async (walletAddress, pathId) => {
   };
 
   try {
-    const response = await axios.post(`${ODOS_BASE_URL}sor/assemble`, params, {
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    });
+    const response = await axiosInstance.post(`sor/assemble`, params);
     return response.data;
   } catch (error) {
     throw new Error(`Error assembling transaction: ${error}`);
   }
+};
+
+const normalizeAddress = (address) => {
+  if (COVALENT_NATIVE_TOKEN_ADDRESSES.includes(address.toLowerCase())) {
+    return "0x0000000000000000000000000000000000000000";
+  } else return address;
 };

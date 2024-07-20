@@ -50,7 +50,9 @@ export const OutputToken = () => {
         );
 
         setOutputAmount(outputAmount);
-        setOutputInUsd(Number(odosQuote.netOutValue));
+        setOutputInUsd(
+          Number(odosQuote.netOutValue) > 0 ? Number(odosQuote.netOutValue) : 0
+        );
         dispatch(setSwapTx(odosQuote.transaction));
       }
       setIsLoading(false);

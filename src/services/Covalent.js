@@ -29,10 +29,12 @@ export const getWalletBalances = async (address, chainId) => {
     await Promise.all(
       tokens.map(async (token) => {
         if (
-          (token.supports_erc[0] === "erc20" || token.native_token) &&
+          ((token.supports_erc && token.supports_erc[0] === "erc20") ||
+            token.native_token) &&
           token.quote_rate > 0 &&
           token.balance > 0
         ) {
+          console.log("TOKEN CUMPLE", token.contract_ticker_symbol);
           userBalances.push({
             userAddress: address,
             tokenAddress: token.contract_address,

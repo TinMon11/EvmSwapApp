@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setInputToken, setInputAmount } from "../store/swapSlice";
+import { setInputToken } from "../store/swapSlice";
 import { setBalance, setIsLoadingBalance } from "../store/walletSlice";
 import { Spinner, RefreshIcon } from "../assets/icons/flowbite-icons";
 import { getWalletBalances } from "../services/Covalent";
@@ -72,6 +72,8 @@ export const Balances = () => {
                   </div>
                 );
               })
+            ) : walletAddress ? (
+              <p className="m-auto text-white">No tokens in your wallet</p>
             ) : (
               <p className="text-white">
                 Connect your wallet to see your balances

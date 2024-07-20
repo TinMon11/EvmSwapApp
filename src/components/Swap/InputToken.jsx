@@ -26,6 +26,7 @@ export const InputToken = ({ token }) => {
     abortControllerRef.current = abortController;
 
     dispatch(setIsLoadingQuote(true));
+
     const parsedAmount = Math.floor(
       Number(debouncedInputAmount) * 10 ** token.tokenDecimals
     );
@@ -36,14 +37,20 @@ export const InputToken = ({ token }) => {
     };
   }, [debouncedInputAmount, dispatch, token.tokenDecimals]);
 
-  const handleClickAmount = (amount) => {
-    const formattedAmount = amount.toFixed(token.tokenDecimals);
-    const parsedAmount = Math.floor(
-      formattedAmount * 10 ** token.tokenDecimals
-    );
-    setTokenAmount(formattedAmount);
-    setInput(formattedAmount);
-    dispatch(setInputAmount(parsedAmount));
+  const handleClickAmount = (quantity) => {
+    if (quantity === "full") {
+      setTokenAmount(
+        (token.tokenBalance / 10 ** token.tokenDecimals).toFixed(2)
+      );
+
+      dispatch(setInputAmount(token.tokenBalance));
+    } else {
+      setTokenAmount(
+        (token.tokenBalance / 2 / 10 ** token.tokenDecimals).toFixed(2)
+      );
+
+      dispatch(setInputAmount(Math.floor(token.tokenBalance / 2)));
+    }
   };
 
   const handleInputChange = (e) => {
@@ -65,19 +72,13 @@ export const InputToken = ({ token }) => {
       <div className="flex flex-col items-end w-full">
         <div className="flex flex-row gap-2">
           <button
-            onClick={() =>
-              handleClickAmount(token.tokenBalance / 10 ** token.tokenDecimals)
-            }
+            onClick={() => handleClickAmount("full")}
             className="px-2 rounded-xl text-xs bg-gray-700 text-gray-200"
           >
             MAX
           </button>
           <button
-            onClick={() =>
-              handleClickAmount(
-                Math.floor(token.tokenBalance / 2) / 10 ** token.tokenDecimals
-              )
-            }
+            onClick={() => handleClickAmount("half")}
             className="px-2 rounded-xl text-xs bg-gray-700 text-gray-200"
           >
             HALF
