@@ -91,6 +91,5 @@ export const awaitTxToBeMined = async (txHash, chainId) => {
       `Transaction ${txHash} not found after ${maxRetries} attempts`
     );
   }
-  console.log("RECEIPT HERE", receipt);
   return receipt;
 };

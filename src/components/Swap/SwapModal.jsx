@@ -105,12 +105,20 @@ export const SwapModal = () => {
         onClick: () => window.open(linkToExplorer, "_blank"),
       });
 
-      const balances = await getWalletBalances(
-        walletAddress,
-        swapTxToSign.chainId
-      );
-
-      dispatch(setBalance(balances));
+      // Covalent API it's not taking inmediatly to update the balance
+      // So delaying 10 seconds to fetch the balance again after the transaction
+      // Can be improved by using webhooks or similar in the future
+      setTimeout(async () => {
+        try {
+          const balances = await getWalletBalances(
+            walletAddress,
+            swapTxToSign.chainId
+          );
+          dispatch(setBalance(balances));
+        } catch (error) {
+          console.error("Error fetching balances:", error);
+        }
+      }, 10000); // 10 seconds delay
     } catch (error) {
       toast.error("Error sending transaction");
     }
