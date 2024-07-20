@@ -98,7 +98,7 @@ export const odosAssembleTransaction = async (walletAddress, pathId) => {
   }
 };
 
-const normalizeAddress = (address) => {
+export const normalizeAddress = (address) => {
   if (COVALENT_NATIVE_TOKEN_ADDRESSES.includes(address.toLowerCase())) {
     return "0x0000000000000000000000000000000000000000";
   } else return address;

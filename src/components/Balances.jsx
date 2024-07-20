@@ -67,7 +67,7 @@ export const Balances = () => {
                       {(
                         Number(balance.tokenBalance) /
                         10 ** balance.tokenDecimals
-                      ).toFixed(2)}
+                      ).toFixed(6)}
                     </p>
                   </div>
                 );

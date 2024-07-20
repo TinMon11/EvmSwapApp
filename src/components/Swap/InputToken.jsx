@@ -26,7 +26,6 @@ export const InputToken = ({ token }) => {
     abortControllerRef.current = abortController;
 
     dispatch(setIsLoadingQuote(true));
-
     const parsedAmount = Math.floor(
       Number(debouncedInputAmount) * 10 ** token.tokenDecimals
     );
@@ -40,13 +39,13 @@ export const InputToken = ({ token }) => {
   const handleClickAmount = (quantity) => {
     if (quantity === "full") {
       setTokenAmount(
-        (token.tokenBalance / 10 ** token.tokenDecimals).toFixed(2)
+        (token.tokenBalance / 10 ** token.tokenDecimals).toFixed(6)
       );
 
       dispatch(setInputAmount(token.tokenBalance));
     } else {
       setTokenAmount(
-        (token.tokenBalance / 2 / 10 ** token.tokenDecimals).toFixed(2)
+        (token.tokenBalance / 2 / 10 ** token.tokenDecimals).toFixed(6)
       );
 
       dispatch(setInputAmount(Math.floor(token.tokenBalance / 2)));

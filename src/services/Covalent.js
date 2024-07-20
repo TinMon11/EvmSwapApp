@@ -1,6 +1,7 @@
 import axios from "axios";
 import { BigNumber } from "ethers";
 const API_KEY = import.meta.env.VITE_COVALENT_API_KEY;
+import { normalizeAddress } from "./Odos";
 
 const COVALENT_CHAIN_IDs = {
   1: "eth-mainnet",
@@ -10,6 +11,9 @@ const COVALENT_CHAIN_IDs = {
   59144: "linea-mainnet",
   56: "bsc-mainnet",
 };
+
+const DEFAULT_LOGO_URL =
+  "https://images.vexels.com/media/users/3/130123/isolated/preview/451253d81a55a06cc55363c70acf09b3-dollar-sign-yellow-circle.png";
 
 export const getWalletBalances = async (address, chainId) => {
   if (!address & !address.startsWith("0x") || !chainId) return [];
@@ -26,6 +30,7 @@ export const getWalletBalances = async (address, chainId) => {
   try {
     const res = await axios.get(COVALENT_ENDPOINT, config);
     const tokens = res.data.data.items;
+    const LiFiTokens = await getLiFiTokens(chainId);
     await Promise.all(
       tokens.map(async (token) => {
         if (
@@ -34,13 +39,26 @@ export const getWalletBalances = async (address, chainId) => {
           token.quote_rate > 0 &&
           token.balance > 0
         ) {
+          // Covalent Logos are not always working, so let's use LiFi logos
+          // If it's not available, use a default logo
+          const normalizedTokenAddress = normalizeAddress(
+            token.contract_address
+          );
+          const tokenOnLifi = LiFiTokens.find(
+            (lifiToken) =>
+              lifiToken.address.toLowerCase() ===
+              normalizedTokenAddress.toLowerCase()
+          );
+
+          const tokenLogo = tokenOnLifi?.logoURI || DEFAULT_LOGO_URL;
+
           userBalances.push({
             userAddress: address,
             tokenAddress: token.contract_address,
             isNative: token.native_token,
             tokenSymbol: token.contract_ticker_symbol,
             tokenDecimals: token.contract_decimals,
-            tokenLogo: token.logo_urls.token_logo_url,
+            tokenLogo: tokenLogo,
             tokenBalance: BigNumber.from(token.balance).toString(),
             tokenPrice: token.quote_rate,
             tokenBalanceInUSD:
@@ -54,5 +72,14 @@ export const getWalletBalances = async (address, chainId) => {
     return userBalances;
   } catch (error) {
     throw new Error(`Error fetching wallet balances: ${error}`);
+  }
+};
+
+const getLiFiTokens = async (chainId) => {
+  try {
+    const res = await axios.get(`https://li.quest/v1/tokens?chains=${chainId}`);
+    return res.data.tokens[chainId];
+  } catch (error) {
+    throw new Error(`Error fetching supported tokens for ${chainId}: ${error}`);
   }
 };
