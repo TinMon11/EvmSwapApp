@@ -2,7 +2,7 @@ import axios from "axios";
 
 const ODOS_BASE_URL = "https://api.odos.xyz/";
 
-const COVALENT_NATIVE_TOKEN_ADDRESSES = [
+export const COVALENT_NATIVE_TOKEN_ADDRESSES = [
   "0x0000000000000000000000000000000000001010",
   "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
 ];

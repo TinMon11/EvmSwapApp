@@ -34,7 +34,6 @@ export const getWalletBalances = async (address, chainId) => {
           token.quote_rate > 0 &&
           token.balance > 0
         ) {
-          console.log("TOKEN CUMPLE", token.contract_ticker_symbol);
           userBalances.push({
             userAddress: address,
             tokenAddress: token.contract_address,

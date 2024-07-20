@@ -1,9 +1,8 @@
 import { ethers, Contract, BigNumber } from "ethers";
 import { ERC20_ABI } from "./ERC20ABI";
+import { COVALENT_NATIVE_TOKEN_ADDRESSES } from "../services/Odos";
 
 const NATIVE_TOKEN_ADDRESS = "0x0000000000000000000000000000000000000000";
-const NATIVE_TOKEN_ADDRESS_COVALENT =
-  "0x0000000000000000000000000000000000001010";
 
 const RPCs = {
   1: "https://eth-pokt.nodies.app",
@@ -41,10 +40,11 @@ export const checkAndConstructApproeTx = async (
   amount
 ) => {
   if (
-    (tokenAddress === NATIVE_TOKEN_ADDRESS) |
-    (tokenAddress === NATIVE_TOKEN_ADDRESS_COVALENT)
-  )
+    tokenAddress === NATIVE_TOKEN_ADDRESS ||
+    COVALENT_NATIVE_TOKEN_ADDRESSES.includes(tokenAddress.toLowerCase())
+  ) {
     return;
+  }
   let approveTx = null;
   const provider = new ethers.providers.JsonRpcProvider(RPCs[chainId]);
   const tokenContract = new ethers.Contract(tokenAddress, ERC20_ABI, provider);
