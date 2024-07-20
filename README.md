@@ -31,6 +31,7 @@ A feature-rich decentralized application (dApp) that allows users to seamlessly 
 3. **Set Covalent API Key:**
    If you are running the project locally, you will need to get an API Key for COVALENT HQ
    [Register for API Key](https://goldrush.dev/docs/api/)
+   Add your API_KEY on a .env file under the name "VITE_COVALENT_API_KEY" (see .env.example)
 
 4. **Run Project:**
    ```sh
