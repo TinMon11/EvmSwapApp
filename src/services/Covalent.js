@@ -1,6 +1,6 @@
 import axios from "axios";
 import { BigNumber } from "ethers";
-const API_KEY = "cqt_rQBcrBkBkhp7dYDg4Xc966RVjy46"; // TODO - TAKE FROM ENV
+const API_KEY = import.meta.env.VITE_COVALENT_API_KEY;
 
 const COVALENT_CHAIN_IDs = {
   1: "eth-mainnet",

@@ -28,7 +28,11 @@ A feature-rich decentralized application (dApp) that allows users to seamlessly 
    npm install
    ```
 
-3. **Run Project:**
+3. **Set Covalent API Key:**
+   If you are running the project locally, you will need to get an API Key for COVALENT HQ
+   [Register for API Key](https://goldrush.dev/docs/api/)
+
+4. **Run Project:**
    ```sh
    npm run dev
    ```
@@ -67,3 +71,6 @@ A feature-rich decentralized application (dApp) that allows users to seamlessly 
 - Tailwind CSS for its fantastic utility-first CSS framework.
 
 ### Feel free to reach out if you have any questions or feedback. Happy swapping! 🚀
+
+- [🤵LinkedIn - Martin Mondino](https://www.linkedin.com/in/martin-mondino/)
+- [📧 Email - Martin Mondino](mailto:martindanielmondino@gmail.com)

@@ -30,6 +30,12 @@ export const getOdosQuote = async (
   amountIn,
   userAddress
 ) => {
+  console.log(
+    "GETTING ODOS QUOTE",
+    inputTokenAddress,
+    outputTokenAddress,
+    amountIn
+  );
   if (
     // Covalent may have this address for native tokens on some chains
     inputTokenAddress === "0x0000000000000000000000000000000000001010" ||

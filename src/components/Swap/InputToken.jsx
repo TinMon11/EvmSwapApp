@@ -1,43 +1,55 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useDispatch } from "react-redux";
 import { setInputAmount, setIsLoadingQuote } from "../../store/swapSlice";
+import { useDebounce } from "../../hooks/useDebounce";
 
 export const InputToken = ({ token }) => {
   const dispatch = useDispatch();
-
   const [tokenAmount, setTokenAmount] = useState(
     (token.tokenBalance / 10 ** token.tokenDecimals).toFixed(2)
   );
+  const [input, setInput] = useState(tokenAmount);
+  const debouncedInputAmount = useDebounce(input, 600);
+  const abortControllerRef = useRef(null);
 
   useEffect(() => {
     setTokenAmount((token.tokenBalance / 10 ** token.tokenDecimals).toFixed(2));
     dispatch(setInputAmount(token.tokenBalance));
   }, [token]);
 
+  useEffect(() => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+
+    const abortController = new AbortController();
+    abortControllerRef.current = abortController;
+
+    dispatch(setIsLoadingQuote(true));
+    const parsedAmount = Math.floor(
+      Number(debouncedInputAmount) * 10 ** token.tokenDecimals
+    );
+    dispatch(setInputAmount(parsedAmount));
+
+    return () => {
+      abortController.abort();
+    };
+  }, [debouncedInputAmount, dispatch, token.tokenDecimals]);
+
   const handleClickAmount = (amount) => {
-    console.log("HANDLE CLICK AMOUNT", amount.toFixed(token.tokenDecimals));
-    console.log(
-      "PARSEADO",
-      Math.floor(
-        amount.toFixed(token.tokenDecimals) * 10 ** token.tokenDecimals
-      )
+    const formattedAmount = amount.toFixed(token.tokenDecimals);
+    const parsedAmount = Math.floor(
+      formattedAmount * 10 ** token.tokenDecimals
     );
-    setTokenAmount(amount.toFixed(token.tokenDecimals));
-    dispatch(
-      setInputAmount(
-        Math.floor(
-          amount.toFixed(token.tokenDecimals) * 10 ** token.tokenDecimals
-        )
-      )
-    );
+    setTokenAmount(formattedAmount);
+    setInput(formattedAmount);
+    dispatch(setInputAmount(parsedAmount));
   };
 
   const handleInputChange = (e) => {
-    dispatch(setIsLoadingQuote(true));
     const value = e.target.value;
     setTokenAmount(value);
-    const parsedAmount = Math.floor(Number(value) * 10 ** token.tokenDecimals);
-    dispatch(setInputAmount(parsedAmount));
+    setInput(value);
   };
 
   return (
